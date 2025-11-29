@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+Íname: CI/CD Pipeline
 
 on:
   push:
@@ -120,15 +120,17 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           load: true
-
+          
       - name: Set short SHA
         id: vars
-         run: echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)" >> $GITHUB_OUTPUT
+        run: |
+          SHORT_SHA=$(echo "$GITHUB_SHA" | cut -c1-7)
+          echo "SHORT_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
       
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: ghcr.io/${{ github.repository }}:sha-${{ github.sha::0:7 }}
+          image-ref: ghcr.io/${{ github.repository }}:sha-${{ steps.vars.outputs.SHORT_SHA }}
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
